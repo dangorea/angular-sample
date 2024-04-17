@@ -8,28 +8,14 @@ import {Subject} from "rxjs";
 export class RecipeService {
   recipesChanged = new Subject<Recipe[]>();
 
-  private recipes: Recipe[] = [
-    new Recipe(
-      'A test Recipe 1',
-      "This is simply a test",
-      "https://www.allrecipes.com/thmb/OY7-yexTvx87Q7jm_UGWdtEHb94=/771x514/filters:no_upscale():max_bytes(150000):strip_icc():focal(399x0:401x2):format(webp)/229949-creamy-white-chili-ddmfs-4x3-0039-fcb66b49658c42048e5ccbcaae74ebeb.jpg",
-      [
-        new Ingredient("Meat", 1),
-        new Ingredient("French Fries", 20)
-      ]
-    ),
-    new Recipe(
-      'A test Recipe 2',
-      "This is simply a test",
-      "https://www.allrecipes.com/thmb/OY7-yexTvx87Q7jm_UGWdtEHb94=/771x514/filters:no_upscale():max_bytes(150000):strip_icc():focal(399x0:401x2):format(webp)/229949-creamy-white-chili-ddmfs-4x3-0039-fcb66b49658c42048e5ccbcaae74ebeb.jpg",
-      [
-        new Ingredient("Buns", 2),
-        new Ingredient("Meat", 1)
-      ]
-    ),
-  ];
+  private recipes: Recipe[] = [];
 
   constructor(private shoppingListService: ShoppingListService) {
+  }
+
+  setRecipes(recipes: Recipe[]) {
+    this.recipes = recipes;
+    this.recipesChanged.next(this.recipes.slice());
   }
 
   getRecipes() {
