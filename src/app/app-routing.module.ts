@@ -1,13 +1,7 @@
 import {NgModule} from "@angular/core";
-import {RouterModule, Routes} from "@angular/router";
-import {RecipesComponent} from "./recipes/recipes.component";
-import {ShoppingListComponent} from "./shopping-list/shopping-list.component";
-import {RecipeStartComponent} from "./recipes/recipe-start/recipe-start.component";
-import {RecipeDetailComponent} from "./recipes/recipe-detail/recipe-detail.component";
-import {RecipeEditComponent} from "./recipes/recipe-edit/recipe-edit.component";
-import {RecipesResolverService} from "./recipes/recipes-resolver.service";
+import {PreloadAllModules, RouterModule, Routes} from "@angular/router";
 import {AuthComponent} from "./auth/auth.component";
-import {AuthGuard} from "./auth/auth.guard";
+import {preloadAndParseTemplate} from "@angular/compiler-cli/src/ngtsc/annotations/component/src/resources";
 
 const appRoute: Routes = [
   {
@@ -17,40 +11,22 @@ const appRoute: Routes = [
   },
   {
     path: 'recipes',
-    component: RecipesComponent,
-    canActivate: [AuthGuard],
-    children: [
-      {
-        path: "",
-        component: RecipeStartComponent
-      },
-      {
-        path: "new",
-        component: RecipeEditComponent,
-      },
-      {
-        path: ":id",
-        component: RecipeDetailComponent,
-        resolve: [RecipesResolverService]
-      },
-      {
-        path: ":id/edit",
-        component: RecipeEditComponent,
-        resolve: [RecipesResolverService]
-      }
-    ]
+    loadChildren: () => import('./recipes/recipes.module').then(i => i.RecipesModule)
   },
   {
     path: 'shopping-list',
-    component: ShoppingListComponent
+    loadChildren: () => import('./shopping-list/shopping-list.module').then(i => i.ShoppingListModule)
   },
   {
-    path: 'auth', component: AuthComponent
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then(i => i.AuthModule)
   }
 ]
 
 @NgModule({
-  imports: [RouterModule.forRoot(appRoute)],
+  imports: [RouterModule.forRoot(appRoute, {
+    preloadingStrategy: PreloadAllModules,
+  })],
   exports: [RouterModule]
 })
 export class AppRoutingModule {

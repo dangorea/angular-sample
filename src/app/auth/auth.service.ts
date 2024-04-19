@@ -1,9 +1,9 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
-import {BehaviorSubject, catchError, Observable, Subject, tap, throwError} from "rxjs";
-import {error} from "@angular/compiler-cli/src/transformers/util";
+import {BehaviorSubject, catchError, Observable, tap, throwError} from "rxjs";
 import {User} from "./user.module";
 import {Router} from "@angular/router";
+import {environment} from "../../environments/environment";
 
 export interface AuthResponseData {
   kind: string;
@@ -18,8 +18,8 @@ export interface AuthResponseData {
 @Injectable({providedIn: 'root'})
 export class AuthService {
   user = new BehaviorSubject<User>(null);
-  private BASE_URL = 'https://identitytoolkit.googleapis.com/v1/accounts'
-  private WEB_KEY = "AIzaSyB3anhnifg0_JUT8Gf4SdZI1hFrT9TYJMI"
+  private BASE_URL = environment.firebaseBASEUrl
+  private WEB_KEY = environment.firebaseAPIKey
   private tokenExpirationTimer: number;
 
   constructor(private http: HttpClient, private router: Router) {
@@ -120,13 +120,13 @@ export class AuthService {
     localStorage.setItem('userData', JSON.stringify(user));
   }
 
-  private handleError(errorResponse: HttpErrorResponse) {
+  private handleError({error}: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!'
-    if (!errorResponse.error || !errorResponse.error.error) {
+    if (!error || !error.error.message) {
       throw throwError(errorMessage)
     }
 
-    switch (errorResponse.error.message) {
+    switch (error.error.message) {
       case 'EMAIL_EXISTS': {
         errorMessage = 'This email exists already'
         break;
@@ -135,7 +135,7 @@ export class AuthService {
         errorMessage = 'This email does not exit.'
         break;
       }
-      case 'INVALID_PASSWORD': {
+      case 'INVALID_LOGIN_CREDENTIALS': {
         errorMessage = 'Incorrect Password.'
         break;
       }
